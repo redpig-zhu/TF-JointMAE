@@ -1,0 +1,14 @@
+defaults:
+  - data: base_caueeg
+  - train: finetune
+  - model: 2D-VGG-19
+  - _self_
+
+# 这是用于微调的默认配置
+# 确保在 data 配置中设置了 pretrain: vgg19_dmae
+# 使用 2D-VGG-19 模型配置，它会自动从 base_caueeg.yaml 中获取其他参数
+
+hydra:
+  run:
+    dir: local/hydra/${now:%Y-%m-%d}/${now:%H-%M-%S}
+

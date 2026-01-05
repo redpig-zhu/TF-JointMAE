@@ -1,0 +1,46 @@
+defaults:
+  - base_train
+  - _self_
+
+# 微调配置 - 专门用于加载预训练权重后进行微调
+run_mode: train
+
+# 微调时使用更小的学习率
+base_lr: 5e-5  # 微调推荐学习率：1e-5 到 5e-5
+search_lr: false
+search_multiplier: 1.0
+
+# 微调训练方式：支持基于epochs或基于total_samples
+# 方式1：基于epochs（推荐）- 设置 num_epochs，会自动计算 total_samples
+num_epochs: 100  # 训练100个epochs，让模型有足够时间学习预训练特征和类别权重
+
+# 方式2：基于total_samples - 如果 num_epochs 为 null，则使用此值
+# 计算公式：total_samples = 迭代次数 * minibatch
+# 如果 minibatch = 64，1000次迭代需要 1000 * 64 = 64000 样本
+# total_samples: 64000.0  # 如果使用此方式，请注释掉上面的 num_epochs
+
+# 日志设置（基于epochs训练时）：
+# 方式1：基于epochs设置（推荐）- 每N个epoch输出一次日志
+# log_interval_epochs: 1  # 每个epoch输出一次日志（默认，如果不设置则使用此值）
+
+# 方式2：基于迭代次数设置 - 每N次迭代输出一次日志
+# log_interval: 10  # 如果设置了此值，会覆盖 log_interval_epochs
+
+# 方式3：使用 num_history - 将总迭代次数分成N份（如果以上都未设置则使用此方式）
+# num_history: 148  # 如果总迭代1484次，设置为148则每 1484//148=10 次迭代输出一次
+
+# Warmup 设置：微调时适当减少 warmup
+warmup_min: 50  # 从 3000 减少到 50
+warmup_ratio: 0.1  # warmup 步数 = 1000 * 0.1 = 100 步
+
+# 微调策略
+freeze_backbone: false  # 如果设为 true，会冻结特征提取层，只训练分类头（更快但可能效果稍差）
+
+# 微调时通常需要更强的正则化来防止过拟合
+weight_decay: 0.01
+mixup: 0.0  # 微调时可以不使用 mixup
+
+# MCI回退策略：倾向于Dementia选Dementia，倾向于Normal选Normal，不确定选MCI
+use_mci_fallback: true  # 启用MCI回退策略
+mci_fallback_threshold: 0.4  # 置信度阈值：Normal或Dementia概率 >= 0.4 才选择，否则选MCI
+

@@ -1,0 +1,22 @@
+defaults:
+  - base_train
+  - _self_
+
+run_mode: pretrain
+total_samples: 5.0e+7
+num_history: 200
+
+pretrain_head:
+  patch_size: 64
+  encoder_dim: 256
+  encoder_depth: 4
+  decoder_dim: 256
+  decoder_depth: 2
+  heads: 8
+  mlp_dim: 512
+  mask_ratio: 0.4
+  dropout: 0.1
+
+pretrain_run_name: dmae_vgg
+
+

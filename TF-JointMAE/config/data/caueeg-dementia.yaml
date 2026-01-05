@@ -1,0 +1,19 @@
+defaults:
+  - base_caueeg
+  - _self_
+
+task: dementia
+transform:
+  normalize:
+    eeg_mean: 0.0  # EEG信号均值
+    eeg_std: 1.0   # EEG信号标准差
+    # 或者使用自动计算
+    # method: 'per_sample'
+
+transform_multicrop:
+  # 多裁剪变换配置
+  size: [224, 224]
+  scale: [0.08, 1.0]
+  ratio: [0.75, 1.33]
+dataset_path: D:/pigfile/redpig_code/caueeg-ceednet-main/datasets/caueeg-dataset/
+
