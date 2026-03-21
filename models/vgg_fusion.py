@@ -9,37 +9,6 @@ from .utils import program_conv_filters
 from .activation import get_activation_class
 import torch.nn.functional  as F
 
-vgg_layer_cfgs: Dict[str, List[Dict[str, int]]] = {
-    "2D-VGG-11": [
-        {"layers": 1, "channel_mul": 1},
-        {"layers": 1, "channel_mul": 2},
-        {"layers": 2, "channel_mul": 4},
-        {"layers": 2, "channel_mul": 8},
-        {"layers": 2, "channel_mul": 8},
-    ],
-    "2D-VGG-13": [
-        {"layers": 2, "channel_mul": 1},
-        {"layers": 2, "channel_mul": 2},
-        {"layers": 2, "channel_mul": 4},
-        {"layers": 2, "channel_mul": 8},
-        {"layers": 2, "channel_mul": 8},
-    ],
-    "2D-VGG-16": [
-        {"layers": 2, "channel_mul": 1},
-        {"layers": 2, "channel_mul": 2},
-        {"layers": 3, "channel_mul": 4},
-        {"layers": 3, "channel_mul": 8},
-        {"layers": 3, "channel_mul": 8},
-    ],
-    "2D-VGG-19": [
-        {"layers": 2, "channel_mul": 1},
-        {"layers": 2, "channel_mul": 2},
-        {"layers": 4, "channel_mul": 4},
-        {"layers": 4, "channel_mul": 8},
-        {"layers": 4, "channel_mul": 8},
-    ],
-}
-
 
 class TripletDataVerifier(nn.Module):
     """三重数据一致性验证器"""
