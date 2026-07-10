@@ -1,122 +1,34 @@
-
 import os
-from collections import OrderedDict
+from collections import defaultdict
 
 import numpy as np
-import pandas as pd
-
-
 import torch
-import torch.nn as nn
 import torch.nn.functional as F
 from torch.cuda.amp import autocast, GradScaler
 from tqdm import tqdm
 
 from datasets.caueeg_script import build_dataset_for_train, load_caueeg_config
 from train.evaluate import (
-    check_accuracy, check_accuracy_extended,
+    calculate_class_wise_metrics,
+    check_accuracy,
+    check_accuracy_extended,
     check_accuracy_multicrop_extended,
-    calculate_class_wise_metrics
 )
-import numpy as np
-import torch
-import torch.nn.functional as F
-from collections import defaultdict
 
-# 统一控制所有输出结果的根目录
 BASE_OUTPUT_DIR = "outputs_all1"
 
 
 def focal_loss(logits, targets, alpha=None, gamma=2.0):
-
-    raise RuntimeError("核心 focal_loss 暂时隐藏：****（论文发表后放出）。")
+    raise RuntimeError("核心 focal_loss 逻辑已隐藏：✳️✳️✳️")
 
 
 def load_pretrained_weights(model, checkpoint_path, device, strict=False):
-    """加载预训练权重"""
     print(f"加载预训练权重: {checkpoint_path}")
 
     if not os.path.exists(checkpoint_path):
         raise FileNotFoundError(f"Checkpoint not found: {checkpoint_path}")
 
-    ckpt = torch.load(checkpoint_path, map_location=device)
-
-    # 处理不同的checkpoint格式
-    if isinstance(ckpt, dict):
-        if "model_state" in ckpt:
-            # 完整checkpoint格式
-            pretrained_state = ckpt["model_state"]
-            print(f"从完整checkpoint加载，epoch: {ckpt.get('epoch', 'unknown')}, "
-                  f"best_val_acc: {ckpt.get('best_val_acc', 'unknown')}")
-        elif "backbone" in ckpt:
-            pretrained_state = ckpt["backbone"]
-        else:
-            # 直接是state_dict
-            pretrained_state = ckpt
-    else:
-        pretrained_state = ckpt
-
-
-    has_vgg_backbone = any(k.startswith("vgg_backbone.") for k in pretrained_state.keys())
-
-    if has_vgg_backbone:
-        # 提取vgg_backbone的权重
-        vgg_state = OrderedDict()
-        for k, v in pretrained_state.items():
-            if k.startswith("vgg_backbone."):
-                new_key = k[len("vgg_backbone."):]
-                vgg_state[new_key] = v
-        print(f"从PretrainMAE提取权重: {len(vgg_state)} 个参数")
-        pretrained_state = vgg_state
-
-    # 获取当前模型的state_dict
-    current_state = model.state_dict()
-
-    raise RuntimeError("核心预训练权重加载逻辑暂时隐藏：****（论文发表后放出）。")
-
-    for k, v in pretrained_state.items():
-        # 如果通道数不匹配，跳过第一层
-        if k in skip_first_layers:
-            if k in current_state and current_state[k].shape != v.shape:
-                skipped_layers.append(f"{k} (跳过第一层，通道数不匹配: {v.shape} vs {current_state[k].shape})")
-                continue
-
-        if k in current_state:
-            if current_state[k].shape == v.shape:
-                filtered_state[k] = v
-                loaded_layers.append(k)
-            else:
-                skipped_layers.append(f"{k} (shape mismatch: {v.shape} vs {current_state[k].shape})")
-        else:
-            skipped_layers.append(f"{k} (not in model)")
-
-    # 加载权重
-    missing_keys, unexpected_keys = model.load_state_dict(filtered_state, strict=strict)
-
-    print(f"成功加载 {len(loaded_layers)} 个层的权重")
-    if missing_keys:
-        print(f"缺失的层 ({len(missing_keys)}): {missing_keys[:5]}...")
-    if unexpected_keys:
-        print(f"意外的层 ({len(unexpected_keys)}): {unexpected_keys[:5]}...")
-    if skipped_layers:
-        print(f"跳过的层 ({len(skipped_layers)}): {skipped_layers[:5]}...")
-        if len(skipped_layers) > 5:
-            print(f"  ... 还有 {len(skipped_layers) - 5} 个层被跳过")
-
-    # 检查是否有第一层被跳过（通道数不匹配的情况）
-    first_layer_skipped = any("第一层" in s or "conv_stage1" in s for s in skipped_layers)
-    if first_layer_skipped:
-        print("\n" + "=" * 60)
-
-        print("=" * 60 + "\n")
-
-    # 警告：如果跳过的层太多，说明模型结构不匹配
-    total_layers = len(current_state)
-    skip_ratio = len(skipped_layers) / total_layers if total_layers > 0 else 0
-
-
-    return model
-
+    raise RuntimeError("核心预训练权重加载逻辑已隐藏：✳️✳️✳️")
 
 def calculate_class_weights(train_loader, num_classes, device, class_label_to_name=None):
     """计算类别权重（处理类别不平衡）"""
@@ -483,12 +395,12 @@ def main_finetune_and_evaluate(
         finetune_batch_size=32,
         device="cuda",
         skip_finetune=False,
+        skip_finetune=False,
         n_monte_carlo_runs=1,
         random_seeds=None,
-
+        skip_test_eval=False,
         skip_multicrop_test_eval=False,
 ):
-
     device = torch.device(device)
 
     print("=" * 80)
@@ -544,7 +456,7 @@ def main_finetune_and_evaluate(
         config["dataset_path"] = dataset_path
         config["task"] = task
 
-        config["model"] = "****"
+        config["model"] = "✳️"
         config["seq_length"] = 2000
         # 统一设置痴呆任务的类别名称顺序：
         # 0 -> Normal, 1 -> SCD/MCI, 2 -> AD
@@ -660,7 +572,7 @@ def main_finetune_and_evaluate(
         from models.vgg_fusion import VGG1D2DFusion
 
         model = VGG1D2DFusion(
-        model="****",
+        model="✳️",
         total_channels=config["total_channels"],  # 使用实际数据的通道数
         out_dims=config["out_dims"],
         seq_len_1d=config["seq_len_1d"],
@@ -671,6 +583,41 @@ def main_finetune_and_evaluate(
         # ===== 3. 加载预训练权重 =====
         model = load_pretrained_weights(model, pretrain_path, device, strict=False)
         history = {"epoch": [], "train_loss": [], "train_acc": [], "val_acc": [], "lr": []}
+        if skip_finetune or finetune_epochs <= 0:
+            print("\n" + "=" * 80)
+            print("?????????")
+            print("=" * 80)
+            results = evaluate_model(
+                model, val_loader, test_loader, multicrop_test_loader,
+                config["preprocess_test"], config, device,
+                output_dir=run_viz_dir,
+                run_test_eval=not skip_test_eval,
+                run_multicrop_test_eval=not skip_multicrop_test_eval,
+            )
+            run_ckpt_path = f"local/checkpoints/finetuned_run_{run_idx + 1}_seed_{current_seed}.pt"
+            run_checkpoint = {
+                "model_state": model.state_dict(),
+                "config": config,
+                "epoch": 0,
+                "best_val_acc": results["val_acc"],
+                "results": results,
+                "run_idx": run_idx,
+                "random_seed": current_seed,
+            }
+            torch.save(run_checkpoint, run_ckpt_path)
+            all_run_results.append({
+                "run_idx": run_idx + 1,
+                "random_seed": current_seed,
+                "best_val_acc": results["val_acc"],
+                "best_epoch": 0,
+                "val_acc": results["val_acc"],
+                "test_acc": results["test_acc"],
+                "multicrop_test_acc": results["multicrop_test_acc"],
+                "test_confusion_matrix": results["test_confusion_matrix"],
+                "multicrop_test_confusion_matrix": results["multicrop_test_confusion_matrix"],
+            })
+            continue
+
 
         # ===== 4. 可选微调 =====
         if not skip_finetune and finetune_epochs > 0:
@@ -882,23 +829,9 @@ if __name__ == "__main__":
                         help="运行次数（默认1，使用随机种子42）")
     parser.add_argument("--random_seeds", type=int, nargs="+", default=None,
                         help="随机种子列表（如果不指定，自动生成：42, 142, 242, ...）")
-    parser.add_argument(
-
-        type=str,
-        default="test",
-        choices=["val", "test", "multicrop_test"],
-
-    )
-    parser.add_argument(
-        "--skip_test_eval",
-        action="store_true",
-
-    )
-    parser.add_argument(
-        "--skip_multicrop_test_eval",
-        action="store_true",
-
-    )
+    parser.add_argument("--eval_split", type=str, default="test", choices=["val", "test", "multicrop_test"], help="??????????")
+    parser.add_argument("--skip_test_eval", action="store_true")
+    parser.add_argument("--skip_multicrop_test_eval", action="store_true")
 
     args = parser.parse_args()
 

@@ -17,8 +17,7 @@ def pretrain_epoch(mae_model, train_loader, device, preprocess_train, scaler=Non
     total_loss = 0.0
     total_mse_loss = 0.0
     total_ce_loss = 0.0
-    # 核心细节暂时隐藏：****
-    # （论文发表后放出）
+    # ✳️
     
     for batch in tqdm(train_loader, desc="Training"):
         # 预处理数据
@@ -31,7 +30,7 @@ def pretrain_epoch(mae_model, train_loader, device, preprocess_train, scaler=Non
         
         # 混合精度训练（MSE 重建 + CE 分类辅助）
         with autocast(enabled=(scaler is not None)):
-            raise RuntimeError("核心训练逻辑暂时隐藏：****（论文发表后放出）。")
+            raise RuntimeError("核心训练逻辑已隐藏：✳️✳️✳️")
         
         # 反向传播
         if scaler is not None:
@@ -97,9 +96,7 @@ def evaluate_backbone(backbone, val_loader, device, config):
 def get_cosine_schedule_with_warmup(optimizer, num_warmup_steps, num_training_steps, min_lr_ratio=0.01):
     """带warmup的cosine学习率调度器，支持min_lr防止衰减过小"""
     def lr_lambda(current_step):
-        # 核心调度策略暂时隐藏：****
-        # （论文发表后放出）
-        raise RuntimeError("核心LR调度逻辑暂时隐藏：****（论文发表后放出）。")
+        raise RuntimeError("核心 LR 调度逻辑已隐藏：✳️✳️✳️")
     
     return torch.optim.lr_scheduler.LambdaLR(optimizer, lr_lambda)
 
@@ -123,8 +120,7 @@ def main():
     # 添加 build_dataset_for_train 需要的必需字段
     config["dataset_path"] = dataset_path
     config["task"] = "dementia"  # 或 "abnormal"，根据你的任务选择
-    # 具体2D-VGG-19模型配置暂时隐藏：****（论文发表后放出）
-    config["model"] = "****"
+    config["model"] = "✳️"
     config["seq_length"] = 2000  # 200Hz * 10s = 2000
     config["file_format"] = args.file_format
     config["load_event"] = False
@@ -157,7 +153,7 @@ def main():
 
     # ===== 2) 构造 backbone（1D+2D 融合 VGG） =====
     backbone = VGG1D2DFusion(
-        model="****",  # 原为 2D-VGG-19，暂时隐藏：论文发表后放出
+        model="✳️",
         total_channels=config["total_channels"],   # 建议用 config 里的参数
         out_dims=config["out_dims"],              # 虽然预训练不用，但保持一致
         seq_len_1d=config["seq_len_1d"],
